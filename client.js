@@ -27,6 +27,38 @@ socket.on('playerDisconnected', (id) => {
     delete players[id];
 });
 
+function movePlayer(deltaX, deltaY) {
+    // Update the player's position based on touch input
+    players[socket.id].x += deltaX;
+    players[socket.id].y += deltaY;
+
+    // Emit the updated player position to the server
+    socket.emit('playerMovement', players[socket.id]);
+}
+
+canvas.addEventListener('touchstart', (e) => {
+    // Store the initial touch position
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault(); // Prevent scrolling on touch devices
+    const touchEndX = e.touches[0].clientX;
+    const touchEndY = e.touches[0].clientY;
+
+    // Calculate the change in X and Y positions
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    // Adjust the player's position based on touch input
+    movePlayer(deltaX, deltaY);
+
+    // Update the start position for the next touchmove event
+    touchStartX = touchEndX;
+    touchStartY = touchEndY;
+});
+
 document.addEventListener('keydown', (event) => {
     const speed = 5;
 
